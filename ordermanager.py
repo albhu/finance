@@ -3,16 +3,11 @@ import json
 import pandas as pd
 import numpy as np
 import json
+from client import FinanceClient
 
 host_ip, server_port = "localhost", 9995
 
-"""
-TO DO:
-split this up to an ordermanager?
-and a strategy?
-"""
-
-class OrderManager:
+class OrderManager(FinanceClient):
     """
     Receive top of the book
     Pass through rules to determine whether or not an order should be submitted
@@ -27,7 +22,6 @@ class OrderManager:
         self.client.connect((host_ip, server_port))
         return self.client
 
-    @property
     def is_connected(self):
         try:
             return self.connect()
@@ -41,7 +35,7 @@ class OrderManager:
         return json.dumps(v).encode('utf-8')
 
     def submit_order(self, quote):
-        if not self.connect():
+        if not self.is_connected():
             self.connect()
         try:
             self.client.send(self.json_format(quote))
@@ -60,9 +54,17 @@ class OrderManager:
         """
         Convert pandas dataframe to dictionary
         """
+        fields = ['symbol', 'quantity', 'side', 'price', 'exchange']
         d = [dict([(colname, row[i])
                 for i,colname in enumerate(df.columns)
             ])
             for row in df.values
         ]
-        return d[0]
+        quote = d[0]
+        ready_order = {k: quote[k] for k in fields}
+        for key, value in ready_order.items():
+            if key == 'side' and value == 'B':
+                ready_order[key] = 'S'
+            elif key == 'side' and value == 'S':
+                ready_order[key] = 'B'
+        return ready_order

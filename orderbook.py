@@ -64,8 +64,12 @@ class OrderBook:
         pd.set_option('display.max_columns', 1000)
         bid, offer = self.format_book()
         if output is True:
-            print(bid)
-            print(offer)
+            print('-----------------------------------------------orderbook-----------------------------------------------------------')
+            if not bid.empty:
+                print(bid)
+            if not offer.empty:
+                print(offer)
+            print('-------------------------------------------------------------------------------------------------------------------')
         return bid, offer
 
     def __str__(self):

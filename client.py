@@ -19,7 +19,6 @@ class FinanceClient:
         self.tcp_client.connect((host_ip, server_port))
         return self.tcp_client
 
-    @property
     def is_connected(self):
         try:
             return self.connect()
@@ -30,7 +29,7 @@ class FinanceClient:
         self.tcp_client.close()
 
     def fetch(self, recv_buffer=1024):
-        if not self.connect():
+        if not self.is_connected():
             self.connect()
         try:
             while True:

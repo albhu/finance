@@ -3,9 +3,7 @@ from orderbook import OrderBook
 from client import FinanceClient
 from ordermanager import OrderManager
 from strategy import Vanilla, Strawberry
-import time
-import socket
-import json
+import sys
 
 # local server for finance data
 host_ip, server_port = "localhost", 9995
@@ -16,13 +14,22 @@ def main():
     - fetch data from the FinanceServer
     - parse out each order as an Order object
     - add these Orders to the OrderBook using the values in Action
-    - for each added order, decide to trade indicated by submit_order
+    - for each added order, decide to trade indicated by signal
     """
+    strategy_choice = sys.argv[1]
     books = {}
     client = FinanceClient(host_ip, server_port)
     ordermanager = OrderManager(host_ip, server_port)
-    strategy = Strawberry()
+
+    if strategy_choice == 'Vanilla':
+        strategy = Vanilla()
+    elif strategy_choice == 'Strawberry':
+        strategy = Strawberry()
+    else:
+        print('strategies available: Vanilla or Strawberry')
+        
     print(strategy.name, strategy.description)
+
     for line in client.fetch():
         try:
             order = Order(line)
@@ -30,13 +37,7 @@ def main():
             if book is None:
                 book = books[order.symbol] = OrderBook(order.symbol)
             book.add(order)
-            bid, offer = book.display_book()
-            print('-----------------------------------------------orderbook-----------------------------------------------------------')
-            if not bid.empty:
-                print(bid)
-            if not offer.empty:
-                print(offer)
-            print('-------------------------------------------------------------------------------------------------------------------')
+            bid, offer = book.display_book(output=True)
             ordermanager.signal(bid, offer, strategy.execute)
 
         except Exception as e:

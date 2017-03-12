@@ -8,6 +8,7 @@ import argparse
 import sys
 import time
 import datetime
+import ast
 
 
 
@@ -50,19 +51,33 @@ class ThreadedServer(object):
         while True:
             try:
                 data = client.recv(size).decode()
-                print('****Order Received!****: ' + data)
                 if data:
+                    print('****Order Received!****: ' + data)
+                    data = ast.literal_eval(data)
+                    with open('archive/order_history' + timestr + '.txt', 'a') as order_history:
+                        for k, v in data.items():
+                            if k == 'symbol':
+                                symbol = v
+                            elif k == 'side':
+                                side = v
+                            elif k == 'quantity':
+                                quantity = str(v)
+                            elif k == 'price':
+                                price = str(v)
+
+                        line = symbol + ',' + side + ',' + quantity + ',' + price
+                        order_history.write(line + '\n')
                     # Set the response to echo back the recieved data
                     a=json.loads(data.rstrip('\n\r '))
                     self.handle_client_answer(a)
                     #client.send(response)
                 else:
-                    print('Client disconnected')
                     return False
             except:
                 print('Client closed the connection')
-                print ("Unexpected error:", sys.exc_info()[0])
+                #print ("Unexpected error:", sys.exc_info()[0])
                 client.close()
+                order_history.close()
                 return False
 
     def handleCustomData(self,buffer):
@@ -108,6 +123,7 @@ if __name__ == "__main__":
                         dest="interval",type=int,default=1)
     
     opt=parser.parse_args()
+    timestr = time.strftime("%Y%m%d-%H%m%s")
     if not opt.port:
         parser.error('Port not given')
     ThreadedServer('127.0.0.1',opt).listen()

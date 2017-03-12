@@ -5,16 +5,30 @@ import numpy as np
 import json
 from ordermanager import OrderManager
 from collections import OrderedDict
-from pnlmanager import Trade, TradeManager, Fill
+
+"""
+TO DO: 
+PNL FROM TXT FILE
+"""
 
 class Strategy(OrderManager):
     def __init__(self, name, description):
         self.name = name
         self.description = description
-        self.market_orders = OrderedDict()
+        #self.market_orders = OrderedDict()
+
+    def as_scalar(self, result):
+        try:
+            result = np.asscalar(result.values)
+        except:
+            pass
+        return result
+    
 """
-Organize strategies here
-- should return T/F
+STRATEGIES
+1) VANILLA
+2) STRAWBERRY
+3) ???
 """
 
 class Vanilla(Strategy):
@@ -38,23 +52,23 @@ class Vanilla(Strategy):
 
         guide = pd.read_csv('strategy_guides/vanilla.csv')
         try:
-            symbol = np.asscalar(bid['symbol'].values)
-            side = np.asscalar(bid['side'].values)
-            news = np.asscalar(bid['news'].astype(int).values)
+            symbol = self.as_scalar(bid['symbol'])
+            side = self.as_scalar(bid['side'])
+            news = self.as_scalar(bid['news'].astype(int))
         except:
             pass
         try:
-            o_symbol = np.asscalar(offer['symbol'].values)
-            o_side = np.asscalar(offer['side'].values)
-            o_news = np.asscalar(offer['news'].astype(int).values)
+            o_symbol = self.as_scalar(offer['symbol'])
+            o_side = self.as_scalar(offer['side'])
+            o_news = self.as_scalar(offer['news'].astype(int))
         except:
             pass
 
         if not bid.empty:
-            guide_price = np.asscalar(guide[(guide.symbol == symbol) \
+            guide_price = self.as_scalar(guide[(guide.symbol == symbol) \
                     & (guide.side == side) \
-                    & (guide.news == news)]['price'].values)
-            bid_price = np.asscalar(bid['price'].astype(float).values)
+                    & (guide.news == news)]['price'])
+            bid_price = self.as_scalar(bid['price'].astype(float))
             if bid_price >= guide_price:
                 bid = self.df_dict(bid)
                 self.submit_order(bid)
@@ -63,11 +77,11 @@ class Vanilla(Strategy):
             return False
 
         if not offer.empty:
-            guide_price_o = np.asscalar(guide[(guide.symbol == o_symbol) \
+            guide_price_o = self.as_scalar(guide[(guide.symbol == o_symbol) \
                     & (guide.side == o_side) \
-                    & (guide.news == o_news)]['price'].values)
-            offer_price = np.asscalar(offer['price'].astype(float).values)
-            if offer_price <= guide_price:
+                    & (guide.news == o_news)]['price'])
+            offer_price = self.as_scalar(offer['price'].astype(float))
+            if offer_price <= guide_price_o:
                 offer = self.df_dict(offer)
                 self.submit_order(offer)
             return True
@@ -93,27 +107,27 @@ class Strawberry(Strategy):
 
         guide = pd.read_csv('strategy_guides/strawberry.csv')
         try:
-            symbol = np.asscalar(bid['symbol'].values)
-            side = np.asscalar(bid['side'].values)
-            news = np.asscalar(bid['news'].astype(int).values)
+            symbol = self.as_scalar(bid['symbol'])
+            side = self.as_scalar(bid['side'])
+            news = self.as_scalar(bid['news'].astype(int))
         except:
             pass
         try:
-            o_symbol = np.asscalar(offer['symbol'].values)
-            o_side = np.asscalar(offer['side'].values)
-            o_news = np.asscalar(offer['news'].astype(int).values)
+            o_symbol = self.as_scalar(offer['symbol'])
+            o_side = self.as_scalar(offer['side'])
+            o_news = self.as_scalar(offer['news'].astype(int))
         except:
             pass
 
         try:
             if not bid.empty:
-                decision = np.asscalar(guide[(guide.symbol == symbol) \
+                decision = (guide[(guide.symbol == symbol) \
                         & (guide.side == side) \
-                        & (guide.news == news)]['is_buy'].values)
+                        & (guide.news == news)]['is_buy'])
+                decision = self.as_scalar(decision)
                 if decision == 'Buy':
                     bid = self.df_dict(bid)
                     self.submit_order(bid)
-                print(a)
                 return True
             else:
                 return False
@@ -122,14 +136,15 @@ class Strawberry(Strategy):
 
         try:
             if not offer.empty:
-                decision_o = np.asscalar(guide[(guide.symbol == symbol_o) \
-                        & (guide.side == side_o) \
-                        & (guide.news == news_o)]['is_buy'].values)
+                decision_o = (guide[(guide.symbol == o_symbol) \
+                        & (guide.side == o_side) \
+                        & (guide.news == o_news)]['is_buy'])
+                decision_o = self.as_scalar(decision_o)
                 if decision_o == 'Sell':
                     offer = self.df_dict(offer)
                     self.submit_order(offer)
                 return True
             else:
                 return False
-        except:
+        except Exception as e:
             pass
