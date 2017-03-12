@@ -6,10 +6,6 @@ import json
 from ordermanager import OrderManager
 from collections import OrderedDict
 
-"""
-TO DO: 
-PNL FROM TXT FILE
-"""
 
 class Strategy(OrderManager):
     def __init__(self, name, description):
@@ -61,33 +57,42 @@ class Vanilla(Strategy):
             o_symbol = self.as_scalar(offer['symbol'])
             o_side = self.as_scalar(offer['side'])
             o_news = self.as_scalar(offer['news'].astype(int))
-        except:
+
+        except Exception as e:
+            pass
+        
+        try:
+            if not bid.empty:
+                guide_price = self.as_scalar(guide[(guide.symbol == symbol) \
+                        & (guide.side == side) \
+                        & (guide.news == news)]['price'])
+                bid_price = self.as_scalar(bid['price'].astype(float))
+                if bid_price >= guide_price:
+                    bid = self.df_dict(bid)
+                    self.submit_order(bid)
+           #     return True
+           # else:
+           #     return False
+
+        except Exception as e:
+            pass
+        
+        try:
+            if not offer.empty:
+                guide_price_o = self.as_scalar(guide[(guide.symbol == o_symbol) \
+                        & (guide.side == o_side) \
+                        & (guide.news == o_news)]['price'])
+                offer_price = self.as_scalar(offer['price'].astype(float))
+                if offer_price <= guide_price_o:
+                    offer = self.df_dict(offer)
+                    self.submit_order(offer)
+            #    return True
+            #else:
+            #    return False
+
+        except Exception as e:
             pass
 
-        if not bid.empty:
-            guide_price = self.as_scalar(guide[(guide.symbol == symbol) \
-                    & (guide.side == side) \
-                    & (guide.news == news)]['price'])
-            bid_price = self.as_scalar(bid['price'].astype(float))
-            if bid_price >= guide_price:
-                bid = self.df_dict(bid)
-                self.submit_order(bid)
-            return True
-        else:
-            return False
-
-        if not offer.empty:
-            guide_price_o = self.as_scalar(guide[(guide.symbol == o_symbol) \
-                    & (guide.side == o_side) \
-                    & (guide.news == o_news)]['price'])
-            offer_price = self.as_scalar(offer['price'].astype(float))
-            if offer_price <= guide_price_o:
-                offer = self.df_dict(offer)
-                self.submit_order(offer)
-            return True
-        else:
-            return False
-        
 class Strawberry(Strategy):
     def __init__(self):
         self.name = 'Strawberry:' + '\n'
@@ -128,9 +133,9 @@ class Strawberry(Strategy):
                 if decision == 'Buy':
                     bid = self.df_dict(bid)
                     self.submit_order(bid)
-                return True
-            else:
-                return False
+            #    return True
+            #else:
+            #    return False
         except:
             pass
 
@@ -143,8 +148,8 @@ class Strawberry(Strategy):
                 if decision_o == 'Sell':
                     offer = self.df_dict(offer)
                     self.submit_order(offer)
-                return True
-            else:
-                return False
+            #    return True
+            #else:
+            #    return False
         except Exception as e:
             pass
