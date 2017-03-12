@@ -22,7 +22,7 @@ def main():
     client = FinanceClient(host_ip, server_port)
     ordermanager = OrderManager(host_ip, server_port)
     strategy = Strawberry()
-    print(strategy.name + ':' , strategy.description)
+    print(strategy.name, strategy.description)
     for line in client.fetch():
         try:
             order = Order(line)
@@ -31,14 +31,14 @@ def main():
                 book = books[order.symbol] = OrderBook(order.symbol)
             book.add(order)
             bid, offer = book.display_book()
-            print('-----------------')
+            print('-----------------------------------------------orderbook-----------------------------------------------------------')
             if not bid.empty:
                 print(bid)
             if not offer.empty:
                 print(offer)
-            print('-----------------')
-            if ordermanager.signal(bid, offer, strategy.execute):
-                print('order sent')
+            print('-------------------------------------------------------------------------------------------------------------------')
+            ordermanager.signal(bid, offer, strategy.execute)
+
         except Exception as e:
             print(e)
             pass

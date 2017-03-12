@@ -50,12 +50,11 @@ class ThreadedServer(object):
         while True:
             try:
                 data = client.recv(size).decode()
-                print('ORDER RECEIVED: ' + data)
+                print('****Order Received!****: ' + data)
                 if data:
                     # Set the response to echo back the recieved data
                     a=json.loads(data.rstrip('\n\r '))
                     self.handle_client_answer(a)
-    
                     #client.send(response)
                 else:
                     print('Client disconnected')

@@ -1,2 +1,1 @@
-# finance
-finance_project
+# MSCA 32016 - Project 2: Finance

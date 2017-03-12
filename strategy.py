@@ -4,13 +4,14 @@ import pandas as pd
 import numpy as np
 import json
 from ordermanager import OrderManager
+from collections import OrderedDict
+from pnlmanager import Trade, TradeManager, Fill
 
 class Strategy(OrderManager):
     def __init__(self, name, description):
         self.name = name
         self.description = description
-
-
+        self.market_orders = OrderedDict()
 """
 Organize strategies here
 - should return T/F
@@ -19,9 +20,13 @@ Organize strategies here
 class Vanilla(Strategy):
     def __init__(self):
         self.name = 'Vanilla' + '\n'
-        self.description = '-------------------------------' + '\n' +\
+        self.description = '*********************' + '\n' +\
+                           '*********************' + '\n' +\
+                           '*********************' + '\n' +\
         'Take means of price for Symbol for different news signals. Buy when the top of the orderbook is lower than the mean. Sell when the top of the orderbook is higher than the mean.' + '\n' + \
-        '-------------------------------'
+                           '*********************' + '\n' +\
+                           '*********************' + '\n' +\
+                           '*********************' + '\n'
         super().__init__(self.name, self.description)
 
     def execute(self, bid=None, offer=None):
@@ -31,7 +36,7 @@ class Vanilla(Strategy):
         - Sell when the top of orderbook is higher than the mean
         """
 
-        guide = pd.read_csv('vanilla.csv')
+        guide = pd.read_csv('strategy_guides/vanilla.csv')
         try:
             symbol = np.asscalar(bid['symbol'].values)
             side = np.asscalar(bid['side'].values)
@@ -71,10 +76,14 @@ class Vanilla(Strategy):
         
 class Strawberry(Strategy):
     def __init__(self):
-        self.name = 'Strawberry' + '\n'
-        self.description = '-------------------------------' + '\n' + \
+        self.name = 'Strawberry:' + '\n'
+        self.description = '*********************' + '\n' +\
+                           '*********************' + '\n' +\
+                           '*********************' + '\n' +\
                 'The Strawberry strategy uses results from OLS on the news indicators to determine whether the presence of news influences bid/offer prices. Make decisions based off the guide created from the coefficients of the regression' + '\n' +\
-                '-------------------------------' 
+                '*********************' + '\n' +\
+                '*********************' + '\n' +\
+                '*********************' + '\n'
         super().__init__(self.name, self.description)
 
     def execute(self, bid=None, offer=None):
@@ -82,7 +91,7 @@ class Strawberry(Strategy):
         Use results from historical OLS regression on News
         """
 
-        guide = pd.read_csv('strawberry.csv')
+        guide = pd.read_csv('strategy_guides/strawberry.csv')
         try:
             symbol = np.asscalar(bid['symbol'].values)
             side = np.asscalar(bid['side'].values)
@@ -101,10 +110,10 @@ class Strawberry(Strategy):
                 decision = np.asscalar(guide[(guide.symbol == symbol) \
                         & (guide.side == side) \
                         & (guide.news == news)]['is_buy'].values)
-                print(decision)
                 if decision == 'Buy':
                     bid = self.df_dict(bid)
                     self.submit_order(bid)
+                print(a)
                 return True
             else:
                 return False
