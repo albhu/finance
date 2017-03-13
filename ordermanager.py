@@ -2,7 +2,6 @@ import socket
 import json
 import pandas as pd
 import numpy as np
-import json
 from client import FinanceClient
 
 host_ip, server_port = "localhost", 9995
@@ -13,32 +12,19 @@ class OrderManager(FinanceClient):
     Pass through rules to determine whether or not an order should be submitted
     Send order from top of book back to server
     """
-    def __init__(self, host_ip, server_port):
-        self.host_ip = host_ip
-        self.server_port = server_port
-
-    def connect(self):
-        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client.connect((host_ip, server_port))
-        return self.client
-
-    def is_connected(self):
-        try:
-            return self.connect()
-        except:
-            return False
-
-    def close(self):
-        self.client.close()
-
+    def __init__(self):
+        #self.host_ip = host_ip
+        #self.server_port = server_port
+        super(OrderManager, self).__init__(host_ip, server_port)
+    
     def json_format(self, v):
         return json.dumps(v).encode('utf-8')
 
     def submit_order(self, quote):
-        if not self.is_connected():
-            self.connect()
+        if not FinanceClient.is_connected(self):
+            FinanceClient.connect(self)
         try:
-            self.client.send(self.json_format(quote))
+            FinanceClient.connect(self).send(self.json_format(quote))
         except Exception as e:
             print(e)
         return

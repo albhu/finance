@@ -4,8 +4,6 @@ import pandas as pd
 import numpy as np
 import json
 from ordermanager import OrderManager
-from collections import OrderedDict
-
 
 class Strategy(OrderManager):
     def __init__(self, name, description):

@@ -74,7 +74,6 @@ class ThreadedServer(object):
                 else:
                     return False
             except:
-                print('Client closed the connection')
                 #print ("Unexpected error:", sys.exc_info()[0])
                 client.close()
                 order_history.close()
@@ -96,7 +95,6 @@ class ThreadedServer(object):
                 client.send((self.convertStringToJSON(i)+'\n').encode('utf-8'))
                 time.sleep(self.opt.interval)
             except:
-                print('End of stream')
                 return False
         client.send((self.convertStringToJSON(self.state)+'\n').encode('utf-8'))   
         return False

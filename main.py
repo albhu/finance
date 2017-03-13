@@ -19,7 +19,7 @@ def main():
     strategy_choice = sys.argv[1]
     books = {}
     client = FinanceClient(host_ip, server_port)
-    ordermanager = OrderManager(host_ip, server_port)
+    ordermanager = OrderManager()
 
     if strategy_choice == 'Vanilla':
         strategy = Vanilla()
