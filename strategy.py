@@ -2,7 +2,6 @@ import socket
 import json
 import pandas as pd
 import numpy as np
-import json
 from ordermanager import OrderManager
 
 class Strategy(OrderManager):
@@ -68,13 +67,10 @@ class Vanilla(Strategy):
                 if bid_price >= guide_price:
                     bid = self.df_dict(bid)
                     self.submit_order(bid)
-           #     return True
-           # else:
-           #     return False
 
         except Exception as e:
             pass
-        
+
         try:
             if not offer.empty:
                 guide_price_o = self.as_scalar(guide[(guide.symbol == o_symbol) \
@@ -84,9 +80,6 @@ class Vanilla(Strategy):
                 if offer_price <= guide_price_o:
                     offer = self.df_dict(offer)
                     self.submit_order(offer)
-            #    return True
-            #else:
-            #    return False
 
         except Exception as e:
             pass
@@ -131,9 +124,6 @@ class Strawberry(Strategy):
                 if decision == 'Buy':
                     bid = self.df_dict(bid)
                     self.submit_order(bid)
-            #    return True
-            #else:
-            #    return False
         except:
             pass
 
@@ -146,8 +136,5 @@ class Strawberry(Strategy):
                 if decision_o == 'Sell':
                     offer = self.df_dict(offer)
                     self.submit_order(offer)
-            #    return True
-            #else:
-            #    return False
         except Exception as e:
             pass
