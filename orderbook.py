@@ -22,7 +22,7 @@ class OrderBook:
         if order.side == 'B':
             self.bid = [e for e in self.bid \
                 if e.get('orderid', '') != order.orderid or \
-                e.get.exchange != order.exchange]
+                e.get('exchange') != order.exchange]
         elif order.side == 'S':
             self.offer = [e for e in self.offer \
                 if e.get('orderid', '') != order.orderid or \
@@ -56,7 +56,7 @@ class OrderBook:
             df_offer = df_offer.drop('order', axis=1)    
         except Exception as e:
             pass
-        df_orderbook = pd.concat([df_bid, df_offer], axis=1)
+        #df_orderbook = pd.concat([df_bid, df_offer], axis=1)
         return df_bid, df_offer
 
     def display_book(self, k=None, output=False):

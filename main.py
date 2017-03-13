@@ -38,7 +38,7 @@ def main():
                 book = books[order.symbol] = OrderBook(order.symbol)
             if order.action == 'A':
                 book.add(order)
-            elif order.side == 'M':
+            elif order.action == 'M':
                 book.modify(order)
             bid, offer = book.display_book(output=True)
             ordermanager.signal(bid, offer, strategy.execute)
