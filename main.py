@@ -27,7 +27,7 @@ def main():
         strategy = Strawberry()
     else:
         print('strategies available: Vanilla or Strawberry')
-        
+
     print(strategy.name, strategy.description)
 
     for line in client.fetch():
@@ -36,7 +36,10 @@ def main():
             book = books.get(order.symbol)
             if book is None:
                 book = books[order.symbol] = OrderBook(order.symbol)
-            book.add(order)
+            if order.action == 'A':
+                book.add(order)
+            elif order.side == 'M':
+                book.modify(order)
             bid, offer = book.display_book(output=True)
             ordermanager.signal(bid, offer, strategy.execute)
 
